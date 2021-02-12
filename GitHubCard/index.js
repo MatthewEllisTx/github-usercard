@@ -4,6 +4,10 @@
     https://api.github.com/users/<your name>
 */
 
+// fetch('https://api.github.com/users/MatthewEllisTx')
+//   .then(response => response.json())
+//   .then( data => console.log('fetch', data))
+
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
     github info! You will need to understand the structure of this
@@ -16,6 +20,27 @@
   STEP 4: Pass the data received from Github into your function,
     and append the returned markup to the DOM as a child of .cards
 */
+const cards = document.querySelector('.cards');
+
+function completeCard(name){
+  addCard(`https://api.github.com/users/${name}`).then( data => {
+    return fetch(data.followers_url);
+  })
+  .then( response => response.json())
+  .then( data => Promise.all(data))
+  .then( data => data.forEach( follower => addCard(follower.url)))
+}
+
+function addCard(url){
+  return fetch(url)
+            .then(response => response.json()) //take string make json
+            .then( data => {
+              cards.appendChild(makeCard(data)); //does work for first card
+              return data;
+            })
+}
+completeCard('MatthewEllisTX');
+completeCard('tetondan');
 
 /*
   STEP 5: Now that you have your own card getting added to the DOM, either
@@ -27,6 +52,12 @@
     Using that array, iterate over it, requesting data for each user, creating a new card for each
     user, and adding that card to the DOM.
 */
+
+fetch('https://api.github.com/users/MatthewEllisTx')
+  .then(response => response.json())
+  .then( data => {
+    console.log(data);
+  })
 
 const followersArray = [];
 
@@ -49,6 +80,50 @@ const followersArray = [];
       </div>
     </div>
 */
+
+function makeCard(info){
+  const card = document.createElement('div');
+  const img = document.createElement('img');
+  const cardInfoDiv = document.createElement('div');
+  const nameH3 = document.createElement('h3');
+  const usernameP = document.createElement('p');
+  const locationP = document.createElement('p');
+  const profileP = document.createElement('p');
+  const profileA = document.createElement('a');
+  const followersP = document.createElement('p');
+  const followingP = document.createElement('p');
+  const bioP = document.createElement('p');
+
+  card.classList.add('card');
+  cardInfoDiv.classList.add('card-info');
+  nameH3.classList.add('name');
+  usernameP.classList.add('username');
+
+  img.src = info.avatar_url;
+  nameH3.textContent = info.name;
+  usernameP.textContent = info.login;
+  locationP.textContent = 'Location: ' + info.location;
+  profileP.textContent = 'Profile: ';
+  profileA.href = info.html_url;
+  profileA.textContent = info.html_url;
+  followersP.textContent = 'Followers: ' + info.followers;
+  followingP.textContent = 'Following: ' + info.following;
+  bioP.textContent = 'Bio: ' + info.bio;
+
+  card.appendChild(img);
+  card.appendChild(cardInfoDiv);
+  cardInfoDiv.appendChild(nameH3);
+  cardInfoDiv.appendChild(usernameP);
+  cardInfoDiv.appendChild(locationP);
+  cardInfoDiv.appendChild(profileP);
+  cardInfoDiv.appendChild(followersP);
+  cardInfoDiv.appendChild(followingP);
+  cardInfoDiv.appendChild(bioP);
+  profileP.appendChild(profileA);
+  console.log(profileP, profileA);
+
+  return card;
+}
 
 /*
   List of LS Instructors Github username's:
